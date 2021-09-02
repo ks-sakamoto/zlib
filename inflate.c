@@ -1253,11 +1253,9 @@ int flush;
                 state->back += state->extra;
             }
 
-            fprintf(stderr, "-------------------------------\n");
-
             Tracevv((stderr, "inflate:         length %u\n", state->length));
             fp = fopen("log6.txt", "a");
-            fprintf(fp, "inflate:         length %u\n", state->length);
+            fprintf(fp, "inflate:~~~~~    length %u\n", state->length);
             fclose(fp);
             state->was = state->length;
             state->mode = DIST;
@@ -1312,7 +1310,7 @@ int flush;
 #endif
             Tracevv((stderr, "inflate:         distance %u\n", state->offset));
             fp = fopen("log6.txt", "a");
-            fprintf(fp, "inflate:         distance %u\n", state->offset);
+            fprintf(fp, "inflate:^^^^^    distance %u\n", state->offset);
             fclose(fp);
             state->mode = MATCH;
         case MATCH:

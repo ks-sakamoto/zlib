@@ -86,6 +86,8 @@
 #include "inflate.h"
 #include "inffast.h"
 
+FILE *fp;
+
 #ifdef MAKEFIXED
 #ifndef BUILDFIXED
 #define BUILDFIXED
@@ -140,6 +142,9 @@ int ZEXPORT inflateResetKeep(strm)
     state->sane = 1;
     state->back = -1;
     Tracev((stderr, "inflate: reset\n"));
+    fp = fopen("log6.txt", "a");
+    fprintf(fp, "inflate: reset\n");
+    fclose(fp);
     return Z_OK;
 }
 
@@ -234,6 +239,9 @@ int stream_size;
     if (state == Z_NULL)
         return Z_MEM_ERROR;
     Tracev((stderr, "inflate: allocated\n"));
+    fp = fopen("log6.txt", "a");
+    fprintf(fp, "inflate: allocated\n");
+    fclose(fp);
     strm->state = (struct internal_state FAR *)state;
     state->strm = strm;
     state->window = Z_NULL;
@@ -752,6 +760,9 @@ int flush;
             }
             state->dmax = 1U << len;
             Tracev((stderr, "inflate:   zlib header ok\n"));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:   zlib header ok\n");
+            fclose(fp);
             strm->adler = state->check = adler32(0L, Z_NULL, 0);
             state->mode = hold & 0x200 ? DICTID : TYPE;
             INITBITS();
@@ -938,12 +949,20 @@ int flush;
             case 0: /* stored block */
                 Tracev((stderr, "inflate:     stored block%s\n",
                         state->last ? " (last)" : ""));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:     stored block%s\n",
+                        state->last ? " (last)" : "");
+                fclose(fp);
                 state->mode = STORED;
                 break;
             case 1: /* fixed block */
                 fixedtables(state);
                 Tracev((stderr, "inflate:     fixed codes block%s\n",
                         state->last ? " (last)" : ""));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:     fixed codes block%s\n",
+                        state->last ? " (last)" : "");
+                fclose(fp);
                 state->mode = LEN_; /* decode codes */
                 if (flush == Z_TREES)
                 {
@@ -954,6 +973,10 @@ int flush;
             case 2: /* dynamic block */
                 Tracev((stderr, "inflate:     dynamic codes block%s\n",
                         state->last ? " (last)" : ""));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:     dynamic codes block%s\n",
+                        state->last ? " (last)" : "");
+                fclose(fp);
                 state->mode = TABLE;
                 break;
             case 3:
@@ -974,6 +997,10 @@ int flush;
             state->length = (unsigned)hold & 0xffff;
             Tracev((stderr, "inflate:       stored length %u\n",
                     state->length));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:       stored length %u\n",
+                    state->length);
+            fclose(fp);
             INITBITS();
             state->mode = COPY_;
             if (flush == Z_TREES)
@@ -999,6 +1026,9 @@ int flush;
                 break;
             }
             Tracev((stderr, "inflate:       stored end\n"));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:       stored end\n");
+            fclose(fp);
             state->mode = TYPE;
             break;
         case TABLE:
@@ -1018,6 +1048,9 @@ int flush;
             }
 #endif
             Tracev((stderr, "inflate:       table sizes ok\n"));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:       table sizes ok\n");
+            fclose(fp);
             state->have = 0;
             state->mode = LENLENS;
         case LENLENS:
@@ -1041,6 +1074,9 @@ int flush;
                 break;
             }
             Tracev((stderr, "inflate:       code lengths ok\n"));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:       code lengths ok\n");
+            fclose(fp);
             state->have = 0;
             state->mode = CODELENS;
         case CODELENS:
@@ -1138,6 +1174,9 @@ int flush;
                 break;
             }
             Tracev((stderr, "inflate:       codes ok\n"));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:       codes ok\n");
+            fclose(fp);
             state->mode = LEN_;
             if (flush == Z_TREES)
                 goto inf_leave;
@@ -1181,12 +1220,18 @@ int flush;
             if ((int)(here.op) == 0)
             {
                 Tracevv((stderr, here.val >= 0x20 && here.val < 0x7f ? "inflate:         literal '%c'\n" : "inflate:         literal 0x%02x\n", here.val));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, here.val >= 0x20 && here.val < 0x7f ? "inflate:         literal '%c'\n" : "inflate:         literal 0x%02x\n", here.val);
+                fclose(fp);
                 state->mode = LIT;
                 break;
             }
             if (here.op & 32)
             {
                 Tracevv((stderr, "inflate:         end of block\n"));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:         end of block\n");
+                fclose(fp);
                 state->back = -1;
                 state->mode = TYPE;
                 break;
@@ -1211,6 +1256,9 @@ int flush;
             fprintf(stderr, "-------------------------------\n");
 
             Tracevv((stderr, "inflate:         length %u\n", state->length));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:         length %u\n", state->length);
+            fclose(fp);
             state->was = state->length;
             state->mode = DIST;
         case DIST:
@@ -1263,6 +1311,9 @@ int flush;
             }
 #endif
             Tracevv((stderr, "inflate:         distance %u\n", state->offset));
+            fp = fopen("log6.txt", "a");
+            fprintf(fp, "inflate:         distance %u\n", state->offset);
+            fclose(fp);
             state->mode = MATCH;
         case MATCH:
             if (left == 0)
@@ -1281,6 +1332,9 @@ int flush;
                     }
 #ifdef INFLATE_ALLOW_INVALID_DISTANCE_TOOFAR_ARRR
                     Trace((stderr, "inflate.c too far\n"));
+                    fp = fopen("log6.txt", "a");
+                    fprintf(fp, "inflate.c too far\n");
+                    fclose(fp);
                     copy -= state->whave;
                     if (copy > state->length)
                         copy = state->length;
@@ -1353,6 +1407,9 @@ int flush;
                 }
                 INITBITS();
                 Tracev((stderr, "inflate:   check matches trailer\n"));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:   check matches trailer\n");
+                fclose(fp);
             }
 #ifdef GUNZIP
             state->mode = LENGTH;
@@ -1368,6 +1425,9 @@ int flush;
                 }
                 INITBITS();
                 Tracev((stderr, "inflate:   length matches trailer\n"));
+                fp = fopen("log6.txt", "a");
+                fprintf(fp, "inflate:   length matches trailer\n");
+                fclose(fp);
             }
 #endif
             state->mode = DONE;
@@ -1427,6 +1487,9 @@ int ZEXPORT inflateEnd(strm)
     ZFREE(strm, strm->state);
     strm->state = Z_NULL;
     Tracev((stderr, "inflate: end\n"));
+    fp = fopen("log6.txt", "a");
+    fprintf(fp, "inflate: end\n");
+    fclose(fp);
     return Z_OK;
 }
 
@@ -1490,6 +1553,9 @@ uInt dictLength;
     }
     state->havedict = 1;
     Tracev((stderr, "inflate:   dictionary set\n"));
+    fp = fopen("log6.txt", "a");
+    fprintf(fp, "inflate:   dictionary set\n");
+    fclose(fp);
     return Z_OK;
 }
 

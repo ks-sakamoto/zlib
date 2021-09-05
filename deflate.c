@@ -1339,6 +1339,8 @@ IPos cur_match; /* current match */
     Posf *prev = s->prev;
     uInt wmask = s->w_mask;
 
+    //fprintf(stderr, "===== longest_match =====\n");
+
 #ifdef UNALIGNED_OK
     /* Compare two bytes at a time. Note: this is not always beneficial.
      * Try with and without -DUNALIGNED_OK to check.
@@ -1998,6 +2000,9 @@ int flush;
              * of window index 0 (in particular we have to avoid a match
              * of the string with itself at the start of the input file).
              */
+
+            fprintf(stderr, "===== deflate_fast longest_match =====\n");
+
             s->match_length = longest_match(s, hash_head);
             /* longest_match() sets match_start */
         }
@@ -2121,6 +2126,9 @@ int flush;
              * of window index 0 (in particular we have to avoid a match
              * of the string with itself at the start of the input file).
              */
+
+            fprintf(stderr, "===== deflate_slow longest_match =====\n");
+
             s->match_length = longest_match(s, hash_head);
             /* longest_match() sets match_start */
 
